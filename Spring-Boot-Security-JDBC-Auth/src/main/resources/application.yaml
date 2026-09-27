@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: Spring-Boot-Security-JDBC-Auth
+
+# MY_SQL DB connection Strings
+  datasource:
+    url: jdbc:mysql://localhost:3306/securitydb
+    username: root
+    password: Dipu@123
