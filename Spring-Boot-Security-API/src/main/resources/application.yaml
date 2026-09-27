@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: Spring-Boot-Security-API
+
+
+# To override default credentials of our application
+
+  security:
+    user:
+      name: Dipu
+      password: test

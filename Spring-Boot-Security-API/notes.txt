@@ -1,0 +1,152 @@
+How to Secure REST APIs using SPRING BOOT
+================================================
+
+-> Security is very important for every web application.
+-> Using to Protect our application and application data we need to implement security logic.
+-> spring security concept we  can use to secure our web applications/REST APIs.
+
+-> We need to secure our spring boot application then we have to add below starter in pom.xml file
+
+            <dependency>
+     			<groupId>org.springframework.boot</groupId>
+     			<artifactId>spring-boot-starter-security-test</artifactId>
+     			<scope>test</scope>
+     		</dependency>
+
+ NOTE:
+  when we add this dependency in pom.xml file then by default our application will be secured with basic authentication.
+  It'll generate random password to access our application.
+ NOTE:
+   Generated Random Password will be printed  on console .
+
+-> we need to use below credentials to access our application
+
+               USERNAME : user
+               Password : <copy the password from console>
+
+-> when we access our application in url browser then it'll display "Login Form" to authenticate our request.
+-> To access secured REST API from POSTMAN, we need to set Authorization values in POSTMAN to send the request.
+
+==================================================
+How to Override Spring Security Random Password
+======================================================
+
+-> To override random credentials we can configure security credentials in application.
+   yaml or application.properties file like;
+  # To override default credentials of our application
+ spring:
+    security:
+      user:
+        name: Dipu
+        password: test
+
+-> After configuring credentials like above , we need to give above credentials to access
+   our application/ APIs.
+
+=============================================
+How to Secure Specific URL Patterns
+=========================================
+
+-> when we add 'security-starter' in pom.xml then it'll apply security filter for all the HTTP methods,
+   of our application.
+
+-> But in reality we need to secure only few method not all
+
+     For Example :
+          /login-page -> every body should be able to access.
+          /transfer -> security required
+          /balance -> security required
+          /aboutus -> security not required
+
+-> In order to achieve above requirement, we need to Customize Security Configuration in our project.
+
+-> Role BAsed Security with JDBC AUTH
+======================================
+    Endpoints:(REST APIs contains 3- methods)
+    ------------
+    / -> root (it's using for public access
+    /admin -> can access by users having ADMIN ROLE
+    /user -> can access by users having USER ROLE & ADMIN ROLE
+
+ Q) Create a security config becoz who should access and permitted that should managed by security.
+
+ I have take one security class and configure which url should be permitted or not?
+
+ here we take one Security Configuration that provide which url is allowed or not ?
+ and i'm take Auth manager, which is used to check our credentials is correct or not by using DB.
+
+Q) How Auth manager is connect to DB?
+ this Auth manager is going to connect with JDBC user-details service and this service connect with
+ DataSource object and DataSource connect with DB
+
+NOTE:
+======
+REST Api, whatever  request is coming to REST APIs which is decided by securityconfig,
+which url is permitted ,securityconfig is decide authenticate Manager is going to execute and Auth
+manager talk to JDBC Service and this service talk to DataSource and DataSource have the DB Configuration.
+
+
+=> Spring Boot security with JDBC Authentication
+===================================================
+
+Step-1) Setup Database tables with required Data
+
+-- users table structure
+    CREATE DATABASE securitydb;
+
+    USE securitydb;
+
+    CREATE TABLE `users` (
+        `username` VARCHAR(50) NOT NULL,
+        `password` VARCHAR(120) NOT NULL,
+        `enabled` TINYINT(1) NOT NULL,
+        PRIMARY KEY (`username`)
+    );
+
+    CREATE TABLE `authorities` (
+        `username` VARCHAR(50) NOT NULL,
+        `authority` VARCHAR(50) NOT NULL,
+        KEY `username` (`username`),
+        CONSTRAINT `authorities_ibfk_1`
+            FOREIGN KEY (`username`)
+            REFERENCES `users` (`username`)
+    );
+
+ ================================Online Encrypt : https://bcrypt-generator.com/ ============
+    -- insert records into table
+
+    insert into users values('admin','$2a$12$qcbzTch2cmcVlhPTkrEmNudq0N6SIZuSqYTL2cA/SJE/pyWSzq1yS', 1);
+    insert into users values('user','$2a$12$JukD88Gm9G4GZ8hhyuwzku6HG8KDUimedG2ZX7eMtyIxKKbixgR4y',1);
+
+    insert into authorities values  ('admin','ROLE_ADMIN');
+    insert into authorities values ('admin','ROLE_USER');
+    insert into authorities values ('user','ROLE_USER');
+
+
+Step -2) Create spring boot application with below dependencies
+
+      a) Web-Starter
+      b) security-starter
+      c) data-jdbc
+      d) mysql-connector
+      e) lombok
+      f) devtools
+
+Step-3) Configure Data Source properties in application.yaml files
+
+  spring:
+    application:
+      name: Spring-Boot-Security-JDBC-Auth
+
+  # MY_SQL DB connection Strings
+    datasource:
+      url: jdbc:mysql://localhost:3306/securitydb
+      username: root
+      password: Dipu@123
+
+Step-4) Create RestController with required methods
+
+        
+
+
+
